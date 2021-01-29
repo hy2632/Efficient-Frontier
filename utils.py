@@ -22,7 +22,7 @@ def get_assets_data(
 ):
 
     assets = []
-    for ticker in tickers:
+    for ticker in tqdm(tickers):
         assets.append(
             data.get_data_yahoo(ticker, start_date,
                                 end_date)["Close"].to_numpy())

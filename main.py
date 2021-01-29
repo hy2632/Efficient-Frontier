@@ -13,10 +13,11 @@ class EfficientFrontier():
 
         self.tickers = tickers
         self.n_assets = len(tickers)
+
+        print(f"===Fetching assets data===")
         self.Rf_mean, self.assets_daily_return = get_assets_data(
             start_date, end_date, tickers)
-
-        print("Successfully get assets data!\n")
+        print("Successfully fetched assets data!\n")
 
         self.Sigma = get_covariance_matrix(self.assets_daily_return)
         # R: mean daily return
@@ -97,7 +98,7 @@ if __name__ == "__main__":
             "WMT",
             "BA",
         ],
-        "20170101",
+        "20090101",
         "20200101",
         50000,
         500,
