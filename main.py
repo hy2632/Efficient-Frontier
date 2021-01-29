@@ -46,12 +46,6 @@ class EfficientFrontier():
             self.n_assets, self.Sigma, self.R, self.arr_mu_solve)
         print("Success!\n")
 
-    def printParams(self, ):
-        print(f"Asset tickers: {self.tickers}")
-        print("Covariance Matrix (Sigma): ")
-        print(self.Sigma)
-        print("Expected annual return: %.4f" % self.R)
-
     def plot(self, ):
         plt.style.use('ggplot')
         plt.figure(figsize=(10, 6))
