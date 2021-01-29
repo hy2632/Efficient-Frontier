@@ -82,6 +82,10 @@ class EfficientFrontier():
         plt.legend()
         plt.show()
 
+    #TODO: solve for the optimal portfolio with best sharpe ratio; Use CAPM and finalize the design of the portfolio
+    def tangency(self):
+        pass
+
 
 if __name__ == "__main__":
     instance = EfficientFrontier(
