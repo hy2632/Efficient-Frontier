@@ -4,7 +4,6 @@ from pandas_datareader import data
 from tqdm import tqdm
 from scipy.optimize import minimize
 from scipy.optimize import NonlinearConstraint
-import pdb
 
 
 def randomWeightGen(n=4):
@@ -14,20 +13,6 @@ def randomWeightGen(n=4):
 
 def rateOfReturn(asset: np.array):
     return asset[1:] / asset[:-1] - 1
-
-
-# def portfolio(w, assets):
-#     """
-#         Parameters:
-#         ---------
-#             assets.shape == (days, n_assets)
-#             w.shape == (n_assets)
-
-#         return:
-#         ---------
-#             portfolio.shape ==(days,)
-#     """
-#     return np.dot(assets, w)
 
 
 def get_assets_data(
@@ -41,7 +26,7 @@ def get_assets_data(
         assets.append(
             data.get_data_yahoo(ticker, start_date,
                                 end_date)["Close"].to_numpy())
-    
+
     assert len(assets) == len(tickers)
 
     # Annual Risk free rate (US 10yr treasury bond, mean over the time period)
@@ -147,12 +132,6 @@ def analyticalSolver(n, Sigma, R, arr_mu):
 def optimizerSolver(n, Sigma, R, arr_mu):
     """
         Solving for the efficient frontier using optimizer scipy.optimize.minimize().
-        
-        Target: min $w^T \Sigma w$
-
-        Constraints: $w_i > 0, 1^Tw=1, R^Tw=mu$
-
-
 
         Parameters:
         ---------
@@ -189,7 +168,7 @@ def optimizerSolver(n, Sigma, R, arr_mu):
 
         result = minimize(
             fun=fun,
-            x0=np.array([1/n] * n),
+            x0=np.array([1 / n] * n),
             constraints=(nlc1, nlc2),
             bounds=bounds,
         )

@@ -90,7 +90,13 @@ class EfficientFrontier():
 
 if __name__ == "__main__":
     instance = EfficientFrontier(
-        ["AAPL", "XOM", "PFE", "WMT", "BA",],
+        [
+            "AAPL",
+            "XOM",
+            "PFE",
+            "WMT",
+            "BA",
+        ],
         "20170101",
         "20200101",
         50000,
