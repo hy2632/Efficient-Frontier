@@ -6,7 +6,7 @@ from scipy.optimize import minimize
 from scipy.optimize import NonlinearConstraint
 
 
-def randomWeightGen(n=4):
+def randomWeightGen(n):
     w = np.random.random(n)
     return w / w.sum()
 
@@ -47,7 +47,7 @@ def get_covariance_matrix(assets_daily_return):
     return Sigma
 
 
-def MonteCarlo(n, Sigma, R, times=50000):
+def MonteCarlo(n, Sigma, R, times):
     """
         Parameters:
         ---------
