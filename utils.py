@@ -1,9 +1,13 @@
 import numpy as np
+import pandas as pd
+import datetime
+from matplotlib import rcParams
 import matplotlib.pyplot as plt
 from pandas_datareader import data
 from tqdm import tqdm
 from scipy.optimize import minimize
 from scipy.optimize import NonlinearConstraint
+
 
 
 def randomWeightGen(n):
@@ -16,11 +20,10 @@ def rateOfReturn(asset: np.array):
 
 
 def get_assets_data(
-    start_date="20190101",
-    end_date="20191231",
-    *tickers,
+    start_date,
+    end_date,
+    tickers: list,
 ):
-
     assets = []
     for ticker in tqdm(tickers):
         assets.append(
@@ -28,23 +31,56 @@ def get_assets_data(
                                 end_date)["Close"].to_numpy())
 
     assert len(assets) == len(tickers)
-
-    # Annual Risk free rate (US 10yr treasury bond, mean over the time period)
-    Rf_mean = data.get_data_yahoo("^TNX", start_date,
-                                  end_date)["Adj Close"].mean() / 100
     assets_daily_return = np.array([rateOfReturn(asset)
                                     for asset in assets]).squeeze()
-
-    return Rf_mean, assets_daily_return
-
+    return assets_daily_return
 
 def get_covariance_matrix(assets_daily_return):
     """
         assets_daily_return: (days, n_assets)
     """
 
-    Sigma = np.cov(assets_daily_return.T, ddof=0)
+    Sigma = np.cov(assets_daily_return, ddof=0)
     return Sigma
+
+
+def get_imputed_rf(start_date, end_date):
+    """
+        Compared to stocks data, risk-free daily data usually have missing values.
+        Use this method to impute.
+    """
+
+    AAPL = data.get_data_yahoo("AAPL", start_date,
+                                end_date)
+    rf = data.get_data_yahoo("^TNX", start_date,
+                                end_date)
+    missing_dates = list(set(AAPL.index) - set(rf.index))
+
+    for missing_date in missing_dates:
+        # Roll back till last date with value:
+        shift = 1
+        while(True):
+            try:
+                line = rf.loc[missing_date - datetime.timedelta(days=shift)]
+            except:
+                shift += 1
+                continue
+            break
+        
+        df_temp = pd.DataFrame(
+        data = {
+            "Date": [missing_date],
+            "High": line["High"],
+            "Low": line["Low"],
+            "Open": line["Open"],
+            "Close": line["Close"],
+            "Volume": line["Volume"],
+            "Adj Close": line["Adj Close"],
+            }
+        ).set_index("Date")
+        rf = rf.append(df_temp)
+
+    return rf.sort_index()
 
 
 def MonteCarlo(n, Sigma, R, times):
@@ -180,3 +216,31 @@ def optimizerSolver(n, Sigma, R, arr_mu):
     arr_w = arr_w.reshape(len(arr_mu), -1)
 
     return arr_volatility, arr_w
+
+def tangencySolver(n, Sigma, R, rf, arr_mu):
+    """
+    Solving for the tangency portfolio / CML analytically by allowing weight on risk-free asset
+
+    $$\lambda = \frac{\mu - r_f}{(R - r_f {\bf1})^T\Sigma^{-1}(R - r_f {\bf1})}$$
+
+    $$w = \lambda\Sigma^{-1} (R - r_f {\bf1})$$
+    """
+
+    ones = np.ones(n)
+    vec1 = R - rf * ones
+    Sigma_inv = np.linalg.inv(Sigma)
+
+    arr_w = np.array([])
+    arr_volatility = np.array([])
+
+    for mu in arr_mu:
+        _lambda = (mu - rf) / (vec1.T.dot(Sigma_inv).dot(vec1))
+        w = _lambda * Sigma_inv.dot(vec1)
+        arr_w = np.append(arr_w, w)
+        volatility = np.sqrt(w.T.dot(Sigma).dot(w))
+        arr_volatility = np.append(arr_volatility, volatility)
+    
+    arr_w = arr_w.reshape(len(arr_mu), -1)
+
+    return arr_volatility, arr_w
+    
