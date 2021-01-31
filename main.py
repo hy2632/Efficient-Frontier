@@ -65,9 +65,9 @@ class EfficientFrontier():
             self.arr_volatility_tangency, self.arr_w_tangency = tangencySolver(
                 self.n_assets, self.Sigma, self.R, self.rf, self.arr_mu_solve)
 
-            self.optimal_SR = (self.arr_mu_solve[100] - self.arr_mu_solve[10]
-                               ) / (self.arr_volatility_tangency[100] -
-                                    self.arr_volatility_tangency[10])
+            self.optimal_SR = (self.arr_mu_solve[solve_granularity * 2 // 3] - self.arr_mu_solve[solve_granularity // 2]
+                               ) / (self.arr_volatility_tangency[solve_granularity * 2 // 3] -
+                                    self.arr_volatility_tangency[solve_granularity // 2])
             print(f"Success! Optimal sharpe ratio: {self.optimal_SR}\n")
 
     def get_optimal_SR(self, ):
@@ -117,21 +117,21 @@ class EfficientFrontier():
             plt.plot(self.arr_volatility_analytical * np.sqrt(253),
                      self.arr_mu_solve * 253 * 100,
                      color="k",
-                     label="Analytical (without risk-free asset)")
+                     label="Analytical (no risk-free)")
 
         # If used optimizer, plot the curve
         if self.use_optimizer:
             plt.plot(self.arr_volatility_optimizer * np.sqrt(253),
                      self.arr_mu_solve * 253 * 100,
                      color="Green",
-                     label="Optimizer (without risk-free asset)")
+                     label="Optimizer (no risk-free, no short)")
 
         # If plot tangency line
         if self.tangency_line:
             plt.plot(self.arr_volatility_tangency * np.sqrt(253),
                      self.arr_mu_solve * 253 * 100,
                      color="c",
-                     label="Tangency line (with risk-free asset)")
+                     label="Tangency line (with risk-free)")
             plt.annotate(
                 "Optimal Sharpe Ratio: " + "%.3f" % self.optimal_SR,
                 xy=(self.arr_volatility_tangency.max() * np.sqrt(253) * 0.1,
