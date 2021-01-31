@@ -135,7 +135,8 @@ class EfficientFrontier():
             plt.annotate(
                 "Optimal Sharpe Ratio: " + "%.3f" % self.optimal_SR,
                 xy=(self.arr_volatility_tangency.max() * np.sqrt(253) * 0.1,
-                    self.arr_mu_solve.max() * 253 * 100 * 0.5), fontsize=12)
+                    self.arr_mu_solve.max() * 253 * 100 * 0.5),
+                fontsize=12)
 
         plt.legend(loc="upper right")
         plt.show()

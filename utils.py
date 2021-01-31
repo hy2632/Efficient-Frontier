@@ -9,7 +9,6 @@ from scipy.optimize import minimize
 from scipy.optimize import NonlinearConstraint
 
 
-
 def randomWeightGen(n):
     w = np.random.random(n)
     return w / w.sum()
@@ -35,6 +34,7 @@ def get_assets_data(
                                     for asset in assets]).squeeze()
     return assets_daily_return
 
+
 def get_covariance_matrix(assets_daily_return):
     """
         assets_daily_return: (days, n_assets)
@@ -50,34 +50,31 @@ def get_imputed_rf(start_date, end_date):
         Use this method to impute.
     """
 
-    AAPL = data.get_data_yahoo("AAPL", start_date,
-                                end_date)
-    rf = data.get_data_yahoo("^TNX", start_date,
-                                end_date)
+    AAPL = data.get_data_yahoo("AAPL", start_date, end_date)
+    rf = data.get_data_yahoo("^TNX", start_date, end_date)
     missing_dates = list(set(AAPL.index) - set(rf.index))
 
     for missing_date in missing_dates:
         # Roll back till last date with value:
         shift = 1
-        while(True):
+        while (True):
             try:
                 line = rf.loc[missing_date - datetime.timedelta(days=shift)]
             except:
                 shift += 1
                 continue
             break
-        
+
         df_temp = pd.DataFrame(
-        data = {
-            "Date": [missing_date],
-            "High": line["High"],
-            "Low": line["Low"],
-            "Open": line["Open"],
-            "Close": line["Close"],
-            "Volume": line["Volume"],
-            "Adj Close": line["Adj Close"],
-            }
-        ).set_index("Date")
+            data={
+                "Date": [missing_date],
+                "High": line["High"],
+                "Low": line["Low"],
+                "Open": line["Open"],
+                "Close": line["Close"],
+                "Volume": line["Volume"],
+                "Adj Close": line["Adj Close"],
+            }).set_index("Date")
         rf = rf.append(df_temp)
 
     return rf.sort_index()
@@ -217,6 +214,7 @@ def optimizerSolver(n, Sigma, R, arr_mu):
 
     return arr_volatility, arr_w
 
+
 def tangencySolver(n, Sigma, R, rf, arr_mu):
     """
     Solving for the tangency portfolio / CML analytically by allowing weight on risk-free asset
@@ -239,8 +237,7 @@ def tangencySolver(n, Sigma, R, rf, arr_mu):
         arr_w = np.append(arr_w, w)
         volatility = np.sqrt(w.T.dot(Sigma).dot(w))
         arr_volatility = np.append(arr_volatility, volatility)
-    
+
     arr_w = arr_w.reshape(len(arr_mu), -1)
 
     return arr_volatility, arr_w
-    
