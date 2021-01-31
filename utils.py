@@ -21,15 +21,15 @@ def rateOfReturn(asset: np.array):
 def get_assets_data(
     start_date,
     end_date,
-    tickers: list,
+    symbols: list,
 ):
     assets = []
-    for ticker in tqdm(tickers):
+    for symbol in tqdm(symbols):
         assets.append(
-            data.get_data_yahoo(ticker, start_date,
+            data.get_data_yahoo(symbol, start_date,
                                 end_date)["Close"].to_numpy())
 
-    assert len(assets) == len(tickers)
+    assert len(assets) == len(symbols)
     assets_daily_return = np.array([rateOfReturn(asset)
                                     for asset in assets]).squeeze()
     return assets_daily_return

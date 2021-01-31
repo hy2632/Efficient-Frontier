@@ -4,7 +4,7 @@ from utils import *
 class EfficientFrontier():
     def __init__(
         self,
-        tickers: list,
+        symbols: list,
         start_date: str,
         end_date: str,
         simulation_times=50000,
@@ -14,8 +14,8 @@ class EfficientFrontier():
         tangency_line=True,
     ):
 
-        self.tickers = tickers
-        self.n_assets = len(tickers)
+        self.symbols = symbols
+        self.n_assets = len(symbols)
         self.analytical_solution = analytical_solution
         self.use_optimizer = use_optimizer
         self.tangency_line = tangency_line
@@ -24,7 +24,7 @@ class EfficientFrontier():
 
         print(f"\n\n===Fetching assets data===")
         self.assets_daily_return = get_assets_data(start_date, end_date,
-                                                   tickers)
+                                                   symbols)
         self.rf = np.mean(
             get_imputed_rf(start_date, end_date)["Adj Close"] / 100 / 253)
         print("Successfully fetched assets data!\n")
@@ -99,10 +99,10 @@ class EfficientFrontier():
 
         # Annualize by 253 trading days per year
         arr_asset_var = self.Sigma.diagonal()
-        for i, ticker in list(enumerate(self.tickers)):
+        for i, symbol in list(enumerate(self.symbols)):
             plt.plot(np.sqrt(arr_asset_var[i]) * np.sqrt(253),
                      self.R[i] * 253 * 100,
-                     label=ticker,
+                     label=symbol,
                      marker="o",
                      mec="black")
 
@@ -144,7 +144,7 @@ class EfficientFrontier():
 
 if __name__ == "__main__":
     instance = EfficientFrontier(
-        tickers=["AAPL", "XOM", "PFE", "F", "WMT", "BA", "TSLA", "AMD"],
+        symbols=["AAPL", "XOM", "PFE", "F", "WMT", "BA", "TSLA", "AMD"],
         start_date="20200101",
         end_date="20210130",
         simulation_times=5000,
