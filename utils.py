@@ -218,10 +218,6 @@ def optimizerSolver(n, Sigma, R, arr_mu):
 def tangencySolver(n, Sigma, R, rf, arr_mu):
     """
     Solving for the tangency portfolio / CML analytically by allowing weight on risk-free asset
-
-    $$\lambda = \frac{\mu - r_f}{(R - r_f {\bf1})^T\Sigma^{-1}(R - r_f {\bf1})}$$
-
-    $$w = \lambda\Sigma^{-1} (R - r_f {\bf1})$$
     """
 
     ones = np.ones(n)
