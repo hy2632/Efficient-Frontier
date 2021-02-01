@@ -80,15 +80,13 @@ def get_imputed_rf(start_date, end_date):
     return rf.sort_index()
 
 
-def MonteCarlo(n, Sigma, R, times):
+def MonteCarlo(n, asset_daily_return, times):
     """
         Parameters:
         ---------
         n: n_assets
 
-        Sigma: Covariance matrix of shape (n, n)
-
-        R: Expected annual return (mean over the time period) of assets in the pool, of shape (n, )
+        asset_daily_return: (n_assets, days), daily return data of assets
         
         times: times of simulation
 
@@ -102,20 +100,22 @@ def MonteCarlo(n, Sigma, R, times):
         
     """
 
-    arr_volatility = []
-    arr_mu = []
     arr_w = []
-
+    arr_mu = []
+    arr_volatility = []
+    
     for i in tqdm(range(times)):
         w = randomWeightGen(n)
         arr_w.append(w)
 
-        arr_volatility.append(np.sqrt(np.dot(w.T, np.dot(Sigma, w))))
-        arr_mu.append(np.dot(R.T, w))
+        portfolio_daily_return = np.dot(w, asset_daily_return)
+        arr_volatility.append(np.std(portfolio_daily_return, ddof=0))
+        arr_mu.append(np.mean(portfolio_daily_return))
 
     arr_volatility = np.array(arr_volatility)
     arr_mu = np.array(arr_mu)
     arr_w = np.array(arr_w).reshape(times, -1)
+
     return arr_mu, arr_volatility, arr_w
 
 

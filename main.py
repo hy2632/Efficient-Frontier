@@ -36,7 +36,7 @@ class EfficientFrontier():
         # Monte Carlo
         print(f"===Running {simulation_times} Monte Carlo simulations===")
         self.arr_mu_MC, self.arr_volatility_MC, self.arr_w_MC = MonteCarlo(
-            self.n_assets, self.Sigma, self.R, simulation_times)
+            self.n_assets, self.assets_daily_return, simulation_times)
         print("Success!\n")
 
         # set the mu array for solving, based on the range of mu from MC
@@ -116,7 +116,7 @@ class EfficientFrontier():
         if self.analytical_solution:
             plt.plot(self.arr_volatility_analytical * np.sqrt(253),
                      self.arr_mu_solve * 253 * 100,
-                     color="k",
+                     color="blue",
                      label="Analytical (no risk-free)")
 
         # If used optimizer, plot the curve
@@ -130,7 +130,7 @@ class EfficientFrontier():
         if self.tangency_line:
             plt.plot(self.arr_volatility_tangency * np.sqrt(253),
                      self.arr_mu_solve * 253 * 100,
-                     color="c",
+                     color="red",
                      label="Tangency line (with risk-free)")
             plt.annotate(
                 "Optimal Sharpe Ratio: " + "%.3f" % self.optimal_SR,
